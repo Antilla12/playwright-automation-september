@@ -7,6 +7,12 @@ const moduleInventory = [
   ['Daily Cap / Ochre', 'Wear', '7', 'Reorder soon'],
   ['Linen Throw / Chalk', 'Home', '24', 'Healthy']
 ];
+const sessionKey = 'northstar-session';
+const isAuthenticated = () => Boolean(localStorage.getItem(sessionKey));
+
+function login() {
+  return `<section class="auth-page"><div class="auth-panel"><span class="eyebrow">Northstar member space</span><h1>Welcome back.</h1><p>Sign in to view orders, delivery updates, and your saved collection.</p><form id="login-form"><div class="field"><label for="login-email">Email address</label><input id="login-email" type="email" required placeholder="alex@example.com"></div><div class="field"><label for="login-password">Password</label><input id="login-password" type="password" required placeholder="Your password"></div><div id="login-error" class="form-error" role="alert"></div><button class="primary-button full" type="submit">Sign in <span>→</span></button></form><p class="demo-note">Demo access: alex@example.com / northstar-demo</p></div><div class="auth-art"><span>MEMBER<br>ACCESS<br>/ 04</span></div></section>`;
+}
 
 function moduleAccount() {
   return `<section class="module-page"><div class="module-hero"><span class="eyebrow">Member space / Alex Morgan</span><h1>Your Northstar.</h1><p>Keep track of orders, saved pieces, and the objects you are considering next.</p></div><div class="module-grid"><article class="module-card accent-lime"><span class="eyebrow">Member since</span><strong>2024</strong><p>Atelier member / level 02</p></article><article class="module-card"><span class="eyebrow">Saved objects</span><strong>06</strong><p>Two pieces are low in stock.</p><a class="text-link" href="#shop">Browse collection →</a></article><article class="module-card wide"><div class="module-card-heading"><div><span class="eyebrow">Latest order</span><h2>#NS-1048 / In transit</h2></div><span class="status-pill">Arrives Friday</span></div><div class="progress-track"><span></span></div><div class="progress-labels"><span>Packed</span><span>In transit</span><span>Delivered</span></div></article></div><div class="module-section"><div class="section-heading"><div><span class="eyebrow">Your activity</span><h2>Recent orders</h2></div><a class="text-link" href="#orders">View all orders →</a></div>${orderTable()}</div></section>`;
@@ -41,12 +47,48 @@ function moduleStudio() {
 function renderModuleRoute() {
   const route = location.hash.slice(1);
   const views = {account: moduleAccount, orders: moduleOrders, support: moduleSupport, dashboard: moduleStudio};
+  if (['account', 'orders', 'dashboard'].includes(route) && !isAuthenticated()) {
+    moduleApp.innerHTML = login();
+    document.querySelectorAll('[data-route]').forEach(link => link.classList.remove('active'));
+    bindLogin();
+    return;
+  }
+  if (route === 'login') {
+    moduleApp.innerHTML = login();
+    bindLogin();
+    return;
+  }
   if (!views[route]) return;
   moduleApp.innerHTML = views[route]();
   document.querySelectorAll('[data-route]').forEach(link => link.classList.toggle('active', link.dataset.route === route));
   window.scrollTo(0, 0);
   if (route === 'dashboard') bindStudioTabs();
+  if (route === 'account') bindLogout();
   if (route === 'support') document.querySelector('#contact-support').addEventListener('click', () => { document.querySelector('#toast').textContent = 'A care specialist will be with you shortly'; document.querySelector('#toast').classList.add('show'); });
+}
+
+function bindLogin() {
+  document.querySelector('#login-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    const error = document.querySelector('#login-error');
+    error.textContent = '';
+    const response = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ email: document.querySelector('#login-email').value, password: document.querySelector('#login-password').value }) });
+    if (!response.ok) {
+      error.textContent = 'The email or password is not recognised.';
+      return;
+    }
+    localStorage.setItem(sessionKey, JSON.stringify(await response.json()));
+    location.hash = 'account';
+  });
+}
+
+function bindLogout() {
+  const hero = document.querySelector('.module-hero');
+  const logout = document.createElement('button');
+  logout.className = 'text-link logout-button';
+  logout.textContent = 'Sign out';
+  logout.addEventListener('click', () => { localStorage.removeItem(sessionKey); location.hash = 'login'; });
+  hero.append(logout);
 }
 
 function bindStudioTabs() {

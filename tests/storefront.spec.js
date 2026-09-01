@@ -2,7 +2,10 @@ const { test, expect } = require('@playwright/test');
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/#home');
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem('northstar-session', JSON.stringify({ token: 'northstar-demo-session', user: { email: 'alex@example.com', name: 'Alex Morgan' } }));
+  });
   await page.reload();
 });
 

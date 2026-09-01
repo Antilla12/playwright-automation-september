@@ -20,6 +20,7 @@ const orders = [
   { id: 'NS-0982', status: 'Delivered', total: 52, items: 1 },
   { id: 'NS-0871', status: 'Delivered', total: 92, items: 2 }
 ];
+const demoUser = { email: 'alex@example.com', password: 'northstar-demo', name: 'Alex Morgan' };
 
 function json(response, status, data) {
   response.writeHead(status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
@@ -38,6 +39,20 @@ function serveStatic(response, pathname) {
 
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
+  if (request.method === 'POST' && url.pathname === '/api/auth/login') {
+    let body = '';
+    request.on('data', chunk => { body += chunk; });
+    request.on('end', () => {
+      try {
+        const credentials = JSON.parse(body);
+        if (credentials.email !== demoUser.email || credentials.password !== demoUser.password) return json(response, 401, { error: 'Invalid email or password' });
+        return json(response, 200, { token: 'northstar-demo-session', user: { email: demoUser.email, name: demoUser.name } });
+      } catch {
+        return json(response, 400, { error: 'Invalid request body' });
+      }
+    });
+    return;
+  }
   if (request.method === 'GET' && url.pathname === '/api/health') return json(response, 200, { status: 'ok', service: 'northstar-api', version: '1.0.0' });
   if (request.method === 'GET' && url.pathname === '/api/products') return json(response, 200, { data: products, count: products.length });
   if (request.method === 'GET' && url.pathname === '/api/inventory') return json(response, 200, { data: products.map(({ id, name, category, stock }) => ({ id, name, category, stock, signal: stock < 10 ? 'reorder' : 'healthy' })) });

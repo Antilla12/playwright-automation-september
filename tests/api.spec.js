@@ -19,4 +19,12 @@ test.describe('Northstar API contract', () => {
     expect(productPayload.data).toEqual(expect.arrayContaining([expect.objectContaining({ id: 'orbit-lamp', price: 128 })]));
     expect(inventoryPayload.data).toEqual(expect.arrayContaining([expect.objectContaining({ id: 'orbit-lamp', signal: 'reorder' })]));
   });
+
+  test('@regression auth endpoint rejects bad credentials and accepts demo access', async ({ request }) => {
+    const rejected = await request.post('/api/auth/login', { data: { email: 'wrong@example.com', password: 'incorrect' } });
+    expect(rejected.status()).toBe(401);
+    const accepted = await request.post('/api/auth/login', { data: { email: 'alex@example.com', password: 'northstar-demo' } });
+    await expect(accepted).toBeOK();
+    await expect(accepted.json()).resolves.toMatchObject({ token: 'northstar-demo-session', user: { name: 'Alex Morgan' } });
+  });
 });
