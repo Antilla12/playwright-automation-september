@@ -95,9 +95,9 @@ test('studio dashboard exposes operational tabs and support contact feedback', a
   await page.goto('/#dashboard');
   await expect(page.getByRole('heading', { name: 'Good work, in view.' })).toBeVisible();
   await expect(page.getByText('$48,290')).toBeVisible();
-  await page.getByRole('button', { name: 'Customers' }).click();
+  await page.getByRole('tab', { name: 'Customers' }).click();
   await expect(page.getByText('Repeat purchase rate')).toBeVisible();
-  await page.getByRole('button', { name: 'Fulfillment queue' }).click();
+  await page.getByRole('tab', { name: 'Fulfillment queue' }).click();
   await expect(page.getByText('Everything is moving.')).toBeVisible();
 
   await page.goto('/#support');

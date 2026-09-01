@@ -37,3 +37,25 @@ The suite covers product filtering and sorting, search with empty states, produc
 - `/#orders` - order history
 - `/#support` - care desk
 - `/#dashboard` - internal operations studio
+
+## API and architecture
+
+The project includes a small Node.js server in [server.js](server.js). It serves the static application and exposes demo endpoints:
+
+- `GET /api/health` - service health and version
+- `GET /api/products` - product catalog data
+- `GET /api/inventory` - stock levels and reorder signals
+- `GET /api/orders` - member order history
+
+Playwright is organized into reusable fixtures and page objects under `tests/`, with separate API contract, accessibility, visual, and workflow specs. The visual baseline is stored beside [visual.spec.js](tests/visual.spec.js).
+
+## Quality commands
+
+```bash
+npm run test:smoke       # tagged critical journeys and API health
+npm run test:regression  # full workflow, API, accessibility, and visual checks
+npm run test:a11y        # axe critical-violation gate
+npm run test:headed      # watch browser automation locally
+```
+
+GitHub Actions runs smoke and regression suites on pushes and pull requests to `main`, then uploads the HTML report and failure evidence as build artifacts.

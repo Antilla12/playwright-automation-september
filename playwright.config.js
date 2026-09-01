@@ -11,7 +11,7 @@ module.exports = defineConfig({
     video: 'retain-on-failure'
   },
   webServer: {
-    command: 'npx serve . -l 4173',
+    command: 'npm start',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: true,
     timeout: 120000
