@@ -1,6 +1,6 @@
 # Northstar Market
 
-A multi-module ecommerce application for demonstrating Playwright automation. Northstar is intentionally self-contained and uses hash routing, local storage, and an in-memory catalog so it can run without a backend while still presenting a realistic product, customer, and operations surface.
+A multi-module ecommerce application for demonstrating Playwright automation. Northstar uses a lightweight Node.js server, an in-memory demo catalog, browser storage, and hash routing to present a realistic product, customer, and operations surface without external infrastructure.
 
 ## Application modules
 
@@ -23,6 +23,7 @@ Open http://localhost:4173.
 ## Run the automation
 
 ```bash
+npm install
 npx playwright install chromium
 npx playwright test
 ```
@@ -42,6 +43,8 @@ The suite covers product filtering and sorting, search with empty states, produc
 
 Demo credentials: `alex@example.com` / `northstar-demo`.
 
+Authentication is intentionally demo-only. The server uses a seeded credential and returns a static demo token; it is designed to showcase automation patterns, not to handle production identities or payment data.
+
 ## API and architecture
 
 The project includes a small Node.js server in [server.js](server.js). It serves the static application and exposes demo endpoints:
@@ -52,7 +55,7 @@ The project includes a small Node.js server in [server.js](server.js). It serves
 - `GET /api/orders` - member order history
 - `POST /api/auth/login` - demo credential verification and session payload
 
-Playwright is organized into reusable fixtures and page objects under `tests/`, with separate API contract, accessibility, visual, and workflow specs. The visual baseline is stored beside [visual.spec.js](tests/visual.spec.js).
+Playwright is organized into reusable fixtures and page objects under `tests/`, with separate API contract, authentication, accessibility, visual, page-object, and workflow specs. The visual baseline is stored beside [visual.spec.js](tests/visual.spec.js). The server is also the test web server, so browser and API checks run against the same process.
 
 ## Quality commands
 
@@ -61,6 +64,23 @@ npm run test:smoke       # tagged critical journeys and API health
 npm run test:regression  # full workflow, API, accessibility, and visual checks
 npm run test:a11y        # axe critical-violation gate
 npm run test:headed      # watch browser automation locally
+npm run test:report      # open the latest HTML report
 ```
 
-GitHub Actions runs smoke and regression suites on pushes and pull requests to `main`, then uploads the HTML report and failure evidence as build artifacts.
+GitHub Actions runs smoke and regression suites on pushes and pull requests to `main`, then uploads the HTML report and failure evidence as build artifacts. The test projects cover Chromium desktop and Pixel 5 mobile emulation; the desktop visual baseline is intentionally maintained separately from functional mobile checks.
+
+## Project map
+
+```text
+server.js                 Node server, static files, and demo API
+index.html                Application shell and global navigation
+app.js                    Storefront, cart, checkout, and route behavior
+modules.js                Account, support, orders, and studio modules
+tests/fixtures.js         Reusable Playwright fixtures
+tests/pages/              Page Object Model classes
+tests/api.spec.js         API contract checks
+tests/authentication.spec.js  Login and protected-route checks
+tests/accessibility.spec.js   Axe critical-violation checks
+tests/visual.spec.js      Screenshot regression check
+.github/workflows/        CI workflow and report artifacts
+```
