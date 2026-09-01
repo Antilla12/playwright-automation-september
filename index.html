@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Northstar Market | Objects with a point of view</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="announcement">Free carbon-neutral shipping on orders over $75 <span>→</span></div>
+  <header class="site-header">
+    <a class="brand" href="#home" data-route="home"><span class="brand-mark">N</span> NORTHSTAR</a>
+    <nav class="main-nav" aria-label="Primary navigation">
+      <a href="#shop" data-route="shop">Shop</a>
+      <a href="#journal" data-route="journal">Journal</a>
+      <a href="#about" data-route="about">About</a>
+      <a href="#dashboard" data-route="dashboard">Studio</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-button" id="search-toggle" aria-label="Open search">⌕</button>
+      <a class="icon-button" id="account-button" href="#account" data-route="account" aria-label="Open account">◎</a>
+      <button class="bag-button" id="cart-toggle" aria-label="Open shopping bag">Bag <span id="cart-count">0</span></button>
+    </div>
+  </header>
+  <div class="search-bar" id="search-bar" hidden><label for="search-input">Search Northstar</label><input id="search-input" placeholder="Try “linen”, “travel”..." autocomplete="off"><button id="clear-search" aria-label="Clear search">×</button></div>
+
+  <main id="app" aria-live="polite"></main>
+
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Shopping bag" aria-hidden="true">
+    <div class="drawer-header"><div><span class="eyebrow">Your edit</span><h2>Shopping bag</h2></div><button class="close-button" id="cart-close" aria-label="Close shopping bag">×</button></div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="drawer-footer"><div class="subtotal"><span>Subtotal</span><strong id="cart-total">$0.00</strong></div><p>Taxes and shipping calculated at checkout.</p><button class="primary-button full" id="checkout-button">Continue to checkout <span>→</span></button></div>
+  </aside>
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+  <script src="modules.js"></script>
+</body>
+</html>
